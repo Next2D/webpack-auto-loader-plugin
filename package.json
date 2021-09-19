@@ -1,0 +1,23 @@
+{
+  "name": "@next2d/webpack-auto-loader-plugin",
+  "description": "Next2D Framework webpack Auto Loader plugin.",
+  "version": "1.0.0",
+  "author": "Toshiyuki Ienaga <ienaga@tvon.jp>",
+  "license": "MIT",
+  "main": "index.js",
+  "homepage": "https://next2d.app",
+  "bugs": "https://github.com/Next2D/webpack-auto-loader-plugin/issues",
+  "keywords": [
+    "Next2D",
+    "Next2D Framework",
+    "webpack",
+    "webpack-auto-loader-plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Next2D/webpack-auto-loader-plugin.git"
+  },
+  "dependencies": {
+    "@types/node": "^16.9.2"
+  }
+}
