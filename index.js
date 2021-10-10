@@ -35,8 +35,8 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Next2D | Env {${this._$env}}</title>
-    <script src="app.js"></script>
+    <title>Next2D | Env | ${this._$env}</title>
+    <script src="/app.js"></script>
 </head>
 <body style="margin: 0; padding: 0;">
 </body>
