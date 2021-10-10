@@ -8,17 +8,59 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 {
     /**
      * @param {string} env
+     * @param {options} [options=null]
      */
-    constructor (env = "dev")
+    constructor (env = "dev", options = null)
     {
         this._$env = env;
+        this._$options = options;
     }
 
     /**
+     * @param   {Compiler} compiler
      * @returns {void}
      */
-    apply ()
+    apply (compiler)
     {
+        if (compiler.options.mode === "production") {
+
+            const options = this._$options;
+            compiler.hooks.afterEmit.tap("Next2DWebpackAutoLoaderPlugin", (compilation) =>
+            {
+                glob(`${compilation.options.output.path}/*`, (err, files) =>
+                {
+                    if (err) {
+                        throw err;
+                    }
+
+                    const filename = compilation.options.output.filename;
+                    files.forEach((file) =>
+                    {
+                        if (file.indexOf(filename) > -1) {
+
+                            if (!options.LICENSE && file.indexOf(`${filename}.LICENSE.txt`) > -1) {
+
+                                fs.unlink(file, (err) => {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                });
+                            }
+
+                        } else {
+
+                            fs.unlink(file, (err) => {
+                                if (err) {
+                                    throw err;
+                                }
+                            });
+
+                        }
+                    });
+                });
+            });
+        }
+
         const cd = process.cwd();
         const envPath = `${cd}/${this._$env}`;
 
@@ -30,7 +72,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 
             fs.writeFileSync(
                 `${envPath}/index.html`,
-`<!DOCTYPE html>
+                `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
