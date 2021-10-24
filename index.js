@@ -73,7 +73,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             fs.writeFileSync(
                 `${envPath}/index.html`,
                 `<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -92,26 +92,45 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             "routing": {}
         };
 
-        const envJson = JSON.parse(
-            fs.readFileSync(`${cd}/src/config/config.json`, { "encoding": "utf8" })
-        );
-        const stageJson = JSON.parse(
-            fs.readFileSync(`${cd}/src/config/stage.json`, { "encoding": "utf8" })
-        );
-        const routingJson = JSON.parse(
-            fs.readFileSync(`${cd}/src/config/routing.json`, { "encoding": "utf8" })
-        );
+        const configPath = `${cd}/src/config/config.json`;
+        if (fs.existsSync(configPath)) {
 
-        if (this._$env in envJson) {
-            Object.assign(config, envJson[this._$env]);
+            const envJson = JSON.parse(
+                fs.readFileSync(configPath, { "encoding": "utf8" })
+            );
+
+            if (this._$env in envJson) {
+                Object.assign(config, envJson[this._$env]);
+            }
+
+            if (envJson.all) {
+                Object.assign(config, envJson.all);
+            }
         }
-        Object.assign(config, envJson.all);
-        Object.assign(config.stage, stageJson);
-        Object.assign(config.routing, routingJson);
+
+        const stagePath = `${cd}/src/config/stage.json`;
+        if (fs.existsSync(stagePath)) {
+
+            const stageJson = JSON.parse(
+                fs.readFileSync(stagePath, { "encoding": "utf8" })
+            );
+
+            Object.assign(config.stage, stageJson);
+        }
+
+        const routingPath = `${cd}/src/config/routing.json`;
+        if (fs.existsSync(routingPath)) {
+
+            const routingJson = JSON.parse(
+                fs.readFileSync(routingPath, { "encoding": "utf8" })
+            );
+
+            Object.assign(config.routing, routingJson);
+        }
 
         fs.writeFileSync(
             `${cd}/src/config/Config.js`,
-            `const config = ${JSON.stringify(config, null, 2)};${os.EOL}export { config };`
+            `const config = ${JSON.stringify(config, null, 4)};${os.EOL}export { config };`
         );
 
         glob(`${cd}/src/**/*.js`, (err, files) =>
