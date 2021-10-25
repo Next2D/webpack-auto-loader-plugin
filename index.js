@@ -150,7 +150,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                 {
                     if (line.startsWith("export class ")) {
                         const name = line.split(" ")[2];
-                        imports += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`
+                        imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
                         packages += `["${name}", ${name}],${os.EOL}`;
                         return true;
                     }
@@ -158,7 +158,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             });
 
             packages = packages.slice(0, -1);
-            packages += `]`;
+            packages += "]";
 
             fs.writeFileSync(
                 `${cd}/src/Packages.js`,
