@@ -10,7 +10,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
      * @param {string} env
      * @param {options} [options=null]
      */
-    constructor (env = "dev", options = null)
+    constructor (env = "local", options = null)
     {
         this._$env = env;
         this._$options = options;
@@ -148,7 +148,9 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 
                 lines.forEach((line) =>
                 {
-                    if (line.startsWith("export class ")) {
+                    if (line.startsWith("export class ")
+                        && (file.indexOf("src/view/") > -1 || file.indexOf("src/model/callback/") > -1)
+                    ) {
                         const name = line.split(" ")[2];
                         imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
                         packages += `["${name}", ${name}],${os.EOL}`;
@@ -157,8 +159,8 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                 });
             });
 
-            packages = packages.slice(0, -1);
-            packages += "]";
+            packages = packages.slice(0, -2);
+            packages += `${os.EOL}]`;
 
             fs.writeFileSync(
                 `${cd}/src/Packages.js`,
