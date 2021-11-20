@@ -36,18 +36,10 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                     const filename = compilation.options.output.filename;
                     files.forEach((file) =>
                     {
-                        if (file.indexOf(filename) > -1) {
-
-                            if (!options.LICENSE && file.indexOf(`${filename}.LICENSE.txt`) > -1) {
-
-                                fs.unlink(file, (err) => {
-                                    if (err) {
-                                        throw err;
-                                    }
-                                });
-                            }
-
-                        } else {
+                        if (file.indexOf(filename) > -1
+                            && !options.LICENSE
+                            && file.indexOf(`${filename}.LICENSE.txt`) > -1
+                        ) {
 
                             fs.unlink(file, (err) => {
                                 if (err) {
