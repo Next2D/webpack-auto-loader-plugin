@@ -144,12 +144,12 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                         const name = line.split(" ")[2];
                         switch (true) {
 
-                            case (file.indexOf("src/view/") > -1):
+                            case file.indexOf("src/view/") > -1:
                                 imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
                                 packages += `["${name}", ${name}],${os.EOL}`;
                                 break;
 
-                            case (file.indexOf("src/model/") > -1):
+                            case file.indexOf("src/model/") > -1:
                                 {
                                     const key = file
                                         .split("src/model/")[1]
