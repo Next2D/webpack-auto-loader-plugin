@@ -22,12 +22,13 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
      */
     apply (compiler)
     {
+        const outputPath = compiler.options.output.path;
         if (compiler.options.mode === "production") {
 
             const options = this._$options;
             compiler.hooks.afterEmit.tap("Next2DWebpackAutoLoaderPlugin", (compilation) =>
             {
-                glob(`${compilation.options.output.path}/*`, (err, files) =>
+                glob(`${outputPath}/*`, (err, files) =>
                 {
                     if (err) {
                         throw err;
@@ -54,16 +55,14 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
         }
 
         const cd = process.cwd();
-        const envPath = `${cd}/${this._$env}`;
+        if (!fs.existsSync(`${outputPath}/index.html`)) {
 
-        if (!fs.existsSync(`${envPath}/index.html`)) {
-
-            if (!fs.existsSync(`${envPath}`)) {
-                fs.mkdirSync(`${envPath}`);
+            if (!fs.existsSync(`${outputPath}`)) {
+                fs.mkdirSync(`${outputPath}`);
             }
 
             fs.writeFileSync(
-                `${envPath}/index.html`,
+                `${outputPath}/index.html`,
                 `<!DOCTYPE html>
 <html>
 <head>
@@ -140,13 +139,32 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 
                 lines.forEach((line) =>
                 {
-                    if (line.startsWith("export class ")
-                        && (file.indexOf("src/view/") > -1 || file.indexOf("src/model/callback/") > -1)
-                    ) {
+                    if (line.startsWith("export class ")) {
+
                         const name = line.split(" ")[2];
-                        imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
-                        packages += `["${name}", ${name}],${os.EOL}`;
-                        return true;
+                        switch (true) {
+
+                            case (file.indexOf("src/view/") > -1):
+                                imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
+                                packages += `["${name}", ${name}],${os.EOL}`;
+                                break;
+
+                            case (file.indexOf("src/model/") > -1):
+                                {
+                                    const key = file
+                                        .split("src/model/")[1]
+                                        .split("/")
+                                        .join(".")
+                                        .slice(0, -3);
+                                    imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
+                                    packages += `["${key}", ${name}],${os.EOL}`;
+                                }
+                                break;
+
+                            default:
+                                break;
+
+                        }
                     }
                 });
             });
