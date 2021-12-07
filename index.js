@@ -144,28 +144,28 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                         const name = line.split(" ")[2];
                         switch (true) {
 
-                            case (file.indexOf("src/view/") > -1):
+                            case file.indexOf("src/view/") > -1:
                                 imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
                                 packages += `["${name}", ${name}],${os.EOL}`;
                                 break;
 
-                            case (file.indexOf("src/model/") > -1):
-                            {
-                                const key = file
-                                    .split("src/model/")[1]
-                                    .split("/")
-                                    .join(".")
-                                    .slice(0, -3);
+                            case file.indexOf("src/model/") > -1:
+                                {
+                                    const key = file
+                                        .split("src/model/")[1]
+                                        .split("/")
+                                        .join(".")
+                                        .slice(0, -3);
 
-                                const asName = file
-                                    .split("src/model/")[1]
-                                    .split("/")
-                                    .join("_")
-                                    .slice(0, -3);
+                                    const asName = file
+                                        .split("src/model/")[1]
+                                        .split("/")
+                                        .join("_")
+                                        .slice(0, -3);
 
-                                imports  += `import { ${name} as ${asName} } from "./${file.split("src/")[1]}";${os.EOL}`;
-                                packages += `["${key}", ${asName}],${os.EOL}`;
-                            }
+                                    imports  += `import { ${name} as ${asName} } from "./${file.split("src/")[1]}";${os.EOL}`;
+                                    packages += `["${key}", ${asName}],${os.EOL}`;
+                                }
                                 break;
 
                             default:
