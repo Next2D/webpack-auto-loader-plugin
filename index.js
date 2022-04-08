@@ -122,7 +122,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                             switch (true) {
 
                                 case file.indexOf("src/view/") > -1:
-                                    imports  += `import { ${name} } from "./${file.split("src/")[1]}";${os.EOL}`;
+                                    imports  += `import { ${name} } from "/src/${file.split("src/")[1].split(".js")[0]}";${os.EOL}`;
                                     packages += `["${name}", ${name}],${os.EOL}`;
                                     break;
 
@@ -140,7 +140,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                                             .join("_")
                                             .slice(0, -3);
 
-                                        imports  += `import { ${name} as ${asName} } from "./${file.split("src/")[1]}";${os.EOL}`;
+                                        imports  += `import { ${name} as ${asName} } from "/src/${file.split("src/")[1]}";${os.EOL}`;
                                         packages += `["${key}", ${asName}],${os.EOL}`;
                                     }
                                     break;
