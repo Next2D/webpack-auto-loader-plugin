@@ -52,6 +52,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             callback();
         });
 
+        const outputPath = compiler.options.output.path;
         if (compiler.options.mode === "production") {
 
             compiler.hooks.afterEmit.tap("Next2DWebpackAutoLoaderPlugin", () =>
@@ -82,7 +83,6 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             });
         }
 
-        const outputPath = compiler.options.output.path;
         if (!fs.existsSync(`${outputPath}/index.html`)) {
 
             if (!fs.existsSync(`${outputPath}`)) {
@@ -171,11 +171,11 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                 throw err;
             }
 
-            let imports = "";
+            let imports  = "";
             let packages = `[${os.EOL}`;
             files.forEach((file) =>
             {
-                const js = fs.readFileSync(file, { "encoding": "utf-8" });
+                const js    = fs.readFileSync(file, { "encoding": "utf-8" });
                 const lines = js.split("\n");
 
                 lines.forEach((line) =>
@@ -217,7 +217,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                 });
             });
 
-            packages = packages.slice(0, -2);
+            packages  = packages.slice(0, -2);
             packages += `${os.EOL}]`;
 
             const value = `${imports}const packages=${packages};${os.EOL}export { packages };`;
