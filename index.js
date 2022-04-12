@@ -48,7 +48,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 
         compiler.hooks.beforeCompile.tapAsync("Next2DWebpackAutoLoaderPlugin", (compilation, callback) =>
         {
-            this._$buildJavaScript(compiler.options.context);
+            this._$buildJavaScript(compilation.normalModuleFactory.context);
             callback();
         });
 
