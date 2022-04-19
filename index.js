@@ -178,6 +178,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                 const js    = fs.readFileSync(file, { "encoding": "utf-8" });
                 const lines = js.split("\n");
 
+                const path  = file.replace(`${dir}/`, "");
                 lines.forEach((line) =>
                 {
                     if (line.startsWith("export class ")) {
@@ -185,28 +186,28 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                         const name = line.split(" ")[2];
                         switch (true) {
 
-                            case file.indexOf("src/view/") > -1:
-                                imports  += `import { ${name} } from "/src/${file.split("src/")[1].split(".js")[0]}";${os.EOL}`;
+                            case path.indexOf("src/view/") > -1:
+                                imports  += `import { ${name} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
                                 packages += `["${name}", ${name}],${os.EOL}`;
                                 break;
 
-                            case file.indexOf("src/model/") > -1:
-                                {
-                                    const key = file
-                                        .split("src/model/")[1]
-                                        .split("/")
-                                        .join(".")
-                                        .slice(0, -3);
+                            case path.indexOf("src/model/") > -1:
+                            {
+                                const key = file
+                                    .split("src/model/")[1]
+                                    .split("/")
+                                    .join(".")
+                                    .slice(0, -3);
 
-                                    const asName = file
-                                        .split("src/model/")[1]
-                                        .split("/")
-                                        .join("_")
-                                        .slice(0, -3);
+                                const asName = file
+                                    .split("src/model/")[1]
+                                    .split("/")
+                                    .join("_")
+                                    .slice(0, -3);
 
-                                    imports  += `import { ${name} as ${asName} } from "/src/${file.split("src/")[1].split(".js")[0]}";${os.EOL}`;
-                                    packages += `["${key}", ${asName}],${os.EOL}`;
-                                }
+                                imports  += `import { ${name} as ${asName} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
+                                packages += `["${key}", ${asName}],${os.EOL}`;
+                            }
                                 break;
 
                             default:
