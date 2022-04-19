@@ -192,22 +192,22 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
                                 break;
 
                             case path.indexOf("src/model/") > -1:
-                            {
-                                const key = file
-                                    .split("src/model/")[1]
-                                    .split("/")
-                                    .join(".")
-                                    .slice(0, -3);
+                                {
+                                    const key = file
+                                        .split("src/model/")[1]
+                                        .split("/")
+                                        .join(".")
+                                        .slice(0, -3);
 
-                                const asName = file
-                                    .split("src/model/")[1]
-                                    .split("/")
-                                    .join("_")
-                                    .slice(0, -3);
+                                    const asName = file
+                                        .split("src/model/")[1]
+                                        .split("/")
+                                        .join("_")
+                                        .slice(0, -3);
 
-                                imports  += `import { ${name} as ${asName} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
-                                packages += `["${key}", ${asName}],${os.EOL}`;
-                            }
+                                    imports  += `import { ${name} as ${asName} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
+                                    packages += `["${key}", ${asName}],${os.EOL}`;
+                                }
                                 break;
 
                             default:
