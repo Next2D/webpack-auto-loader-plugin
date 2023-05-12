@@ -7,17 +7,24 @@ const os   = require("os");
 module.exports = class Next2DWebpackAutoLoaderPlugin
 {
     /**
-     * @param {string} [env=local]
+     * @param {object} object
      * @param {object} [options=null]
      */
-    constructor (env = "local", options = null)
+    constructor (object, options = null)
     {
         /**
          * @type {string}
          * @default local
          * @private
          */
-        this._$env = env;
+        this._$env = object.environment;
+
+        /**
+         * @type {string}
+         * @default web
+         * @private
+         */
+        this._$platform = object.platform;
 
         /**
          * @type {Object}
@@ -83,10 +90,12 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             });
         }
 
-        if (!fs.existsSync(`${outputPath}/index.html`)) {
+        if (this._$env === "local"
+            && !fs.existsSync(`${outputPath}/index.html`)
+        ) {
 
             if (!fs.existsSync(`${outputPath}`)) {
-                fs.mkdirSync(`${outputPath}`);
+                fs.mkdirSync(`${outputPath}`, { "recursive": true });
             }
 
             fs.writeFileSync(
@@ -96,8 +105,8 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Next2D | Env | ${this._$env}</title>
-    <script src="/app.js"></script>
+    <title>${this._$env}</title>
+    <script src="./app.js"></script>
 </head>
 <body style="margin: 0; padding: 0;">
 </body>
@@ -114,6 +123,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
     _$buildJavaScript (dir)
     {
         const config = {
+            "platform": this._$platform,
             "stage"  : {},
             "routing": {}
         };
