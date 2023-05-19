@@ -116,6 +116,66 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
     }
 
     /**
+     * @param  {string} path
+     * @return {string}
+     */
+    _$getFileType (path)
+    {
+        try {
+
+            const stat = fs.statSync(path);
+
+            switch (true) {
+                case stat.isFile():
+                    return "file";
+
+                case stat.isDirectory():
+                    return "directory";
+
+                default:
+                    return "unknown";
+            }
+
+        } catch (e) {
+
+            return "unknown";
+
+        }
+    }
+
+    /**
+     * @param  {string} dir_path
+     * @return {array}
+     * @private
+     */
+    _$listFiles (dir_path)
+    {
+        const files = [];
+        const paths = fs.readdirSync(dir_path);
+
+        for (let idx = 0; idx < paths.length; ++idx) {
+
+            const path = `${dir_path}/${paths[idx]}`;
+            switch (this._$getFileType(path)) {
+
+                case "file":
+                    files.push(path);
+                    break;
+
+                case "directory":
+                    files.push(...this._$listFiles(path));
+                    break;
+
+                default:
+                    break;
+
+            }
+        }
+
+        return files;
+    };
+
+    /**
      *
      * @param {string} dir
      * @private
@@ -175,71 +235,72 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             );
         }
 
-        glob(`${dir}/src/**/*.js`, (err, files) =>
-        {
-            console.log("cwd: ", dir);
-            if (err) {
-                throw err;
+        const files  = this._$listFiles(`${dir}/src`);
+        let imports  = "";
+        let packages = `[${os.EOL}`;
+        for (let idx = 0; idx < files.length; ++idx) {
+
+            const file = files[idx];
+            if (file.indexOf(".js") === -1) {
+                continue;
             }
 
-            let imports  = "";
-            let packages = `[${os.EOL}`;
-            console.log("Files: ", files);
-            files.forEach((file) =>
-            {
-                const js    = fs.readFileSync(file, { "encoding": "utf-8" });
-                const lines = js.split("\n");
+            const js    = fs.readFileSync(file, { "encoding": "utf-8" });
+            const lines = js.split("\n");
 
-                const path  = file.replace(`${dir}/`, "");
-                lines.forEach((line) =>
-                {
-                    if (line.startsWith("export class ")) {
+            const path = file.replace(`${dir}/`, "");
+            for (let idx = 0; idx < lines.length; ++idx) {
 
-                        const name = line.split(" ")[2];
-                        switch (true) {
+                const line = lines[idx];
+                if (line.indexOf("export class ") === -1) {
+                    continue;
+                }
 
-                            case path.indexOf("src/view/") > -1:
-                                imports  += `import { ${name} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
-                                packages += `["${name}", ${name}],${os.EOL}`;
-                                break;
+                const name = line.split(" ")[2];
+                switch (true) {
 
-                            case path.indexOf("src/model/") > -1:
-                                {
-                                    const key = file
-                                        .split("src/model/")[1]
-                                        .split("/")
-                                        .join(".")
-                                        .slice(0, -3);
+                    case path.indexOf("src/view/") > -1:
+                        imports  += `import { ${name} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
+                        packages += `["${name}", ${name}],${os.EOL}`;
+                        break;
 
-                                    const asName = file
-                                        .split("src/model/")[1]
-                                        .split("/")
-                                        .join("_")
-                                        .slice(0, -3);
+                    case path.indexOf("src/model/") > -1:
+                    {
+                        const key = file
+                            .split("src/model/")[1]
+                            .split("/")
+                            .join(".")
+                            .slice(0, -3);
 
-                                    imports  += `import { ${name} as ${asName} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
-                                    packages += `["${key}", ${asName}],${os.EOL}`;
-                                }
-                                break;
+                        const asName = file
+                            .split("src/model/")[1]
+                            .split("/")
+                            .join("_")
+                            .slice(0, -3);
 
-                            default:
-                                break;
-
-                        }
+                        imports  += `import { ${name} as ${asName} } from "/src/${path.split("src/")[1].split(".js")[0]}";${os.EOL}`;
+                        packages += `["${key}", ${asName}],${os.EOL}`;
                     }
-                });
-            });
+                        break;
 
-            packages  = packages.slice(0, -2);
-            packages += `${os.EOL}]`;
+                    default:
+                        break;
 
-            const value = `${imports}const packages=${packages};${os.EOL}export { packages };`;
-            console.log("Export: ", this._$cachePackages, value);
-            if (this._$cachePackages !== value) {
-                // cache
-                this._$cachePackages = value;
-                fs.writeFileSync(`${dir}/src/Packages.js`, value);
+                }
+
+                break;
+
             }
-        });
+        }
+
+        packages  = packages.slice(0, -2);
+        packages += `${os.EOL}]`;
+
+        const value = `${imports}const packages=${packages};${os.EOL}export { packages };`;
+        if (this._$cachePackages !== value) {
+            // cache
+            this._$cachePackages = value;
+            fs.writeFileSync(`${dir}/src/Packages.js`, value);
+        }
     }
 };
