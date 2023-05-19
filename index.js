@@ -177,12 +177,14 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
 
         glob(`${dir}/src/**/*.js`, (err, files) =>
         {
+            console.log("cwd: ", dir);
             if (err) {
                 throw err;
             }
 
             let imports  = "";
             let packages = `[${os.EOL}`;
+            console.log("Files: ", files);
             files.forEach((file) =>
             {
                 const js    = fs.readFileSync(file, { "encoding": "utf-8" });
@@ -232,6 +234,7 @@ module.exports = class Next2DWebpackAutoLoaderPlugin
             packages += `${os.EOL}]`;
 
             const value = `${imports}const packages=${packages};${os.EOL}export { packages };`;
+            console.log("Export: ", this._$cachePackages, value);
             if (this._$cachePackages !== value) {
                 // cache
                 this._$cachePackages = value;
